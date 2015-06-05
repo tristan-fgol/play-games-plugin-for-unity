@@ -286,11 +286,87 @@ namespace GooglePlayGames.Native
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
             }
         }
+
+        #region Extra Server Auth Code added by FGOL
+
+        private AndroidJavaObject GetApiClient(GameServices services)
+        {
+            using(var currentActivity = GetActivity())
+            {
+                using(AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
+                {
+                    using(AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder", currentActivity))
+                    {
+                        jc_builder.Call<AndroidJavaObject>("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
+                        jc_builder.Call<AndroidJavaObject>("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
+                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject>("build");
+                        client.Call("connect");
+
+                        Debug.LogWarning("TODO Do this in a coroutine!");
+                        while(!client.Call<bool>("isConnected"))
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        return client;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #endif
+
+        #region Extra Server Auth Code added by FGOL
+
+        public string GetUserEmail()
+        {
+            string email = null;
+            #if UNITY_ANDROID
+            using(AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
+            {
+                using(AndroidJavaObject jo_plusAccountApi = jc_plus.GetStatic<AndroidJavaObject>("AccountApi"))
+                {
+                    Debug.Log("jo_plusAccountApi: " + (jo_plusAccountApi == null ? "NULL" : jo_plusAccountApi.ToString()));
+                    using(var apiClient = GetApiClient(mServices))
+                    {
+                        Debug.Log("apiClient: " + (apiClient == null ? "NULL" : apiClient.ToString()));
+                        email = jo_plusAccountApi.Call<string>("getAccountName", apiClient);
+                        Logger.d("Player email: " + email);
+                    }
+                }
+            }
+            #endif
+            return email;
+        }
+
+        public string GetToken()
+        {
+            string token = null;
+            #if UNITY_ANDROID
+            Debug.Log("Before RetrieveUserEmail");
+            string email = GetUserEmail() ?? "NULL";
+            Debug.Log("After RetrieveUserEmail email: " + email);
+            string scope = "audience:server:client_id:" + "101626759741-kc5sdafasdfsdf9j1aek9bfgfou3oom.apps.googleusercontent.com";//CLIENT_ID;
+            using(AndroidJavaClass jc_unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
+                   jc_gau = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
+            {
+                using(AndroidJavaObject jo_Activity = jc_unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                {
+                    token = jc_gau.CallStatic<string>("getToken", jo_Activity, email, scope);
+                }
+            }
+            Debug.Log("Token " + token);
+            #endif
+            return token;
+        }
+
+        #endregion
 
         internal static PlatformConfiguration CreatePlatformConfiguration()
         {
-            #if UNITY_ANDROID
+#if UNITY_ANDROID
             var config = AndroidPlatformConfiguration.Create();
             config.EnableAppState();
             using (var activity = GetActivity())
@@ -321,9 +397,9 @@ namespace GooglePlayGames.Native
             }
 
             return config;
-            #endif
+#endif
 
-            #if UNITY_IPHONE
+#if UNITY_IPHONE
             if (!GameInfo.IosClientIdInitialized())
             {
                 throw new System.InvalidOperationException("Could not locate the OAuth Client ID, " +
@@ -333,7 +409,7 @@ namespace GooglePlayGames.Native
             var config = IosPlatformConfiguration.Create();
             config.SetClientId(GameInfo.IosClientId);
             return config;
-            #endif
+#endif
         }
 
         public bool IsAuthenticated()

@@ -61,6 +61,20 @@ public class DummyClient : IPlayGamesClient
       return null;
     }
 
+    #region ADDED BY FGOL
+    public string GetUserEmail()
+    {
+        LogUsage();
+        return null;
+    }
+
+    public string GetToken()
+    {
+        LogUsage();
+        return null;
+    }
+    #endregion
+
     public List<Achievement> GetAchievements()
     {
       LogUsage();

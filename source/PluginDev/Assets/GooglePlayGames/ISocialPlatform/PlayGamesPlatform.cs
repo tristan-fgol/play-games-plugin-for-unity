@@ -201,6 +201,18 @@ namespace GooglePlayGames
             }
         }
 
+        #region Added by FGOL
+
+        //TODO may need to actually add wrappers for each function required
+        public IPlayGamesClient Client
+        {
+            get
+            {
+                return mClient;
+            }
+        }
+        #endregion
+
         public IEventsClient Events
         {
             get

@@ -25,3 +25,8 @@ samples/**/Library.meta
 
 source/PluginDev/ProjectSettings/GraphicsSettings.asset
 source/PluginDev/ProjectSettings/NavMeshAreas.asset
+source/PluginDev/UnityVS.PluginDev.CSharp.csproj
+source/PluginDev/UnityVS.PluginDev.CSharp.Editor.csproj
+source/PluginDev/UnityVS.PluginDev.sln
+source/PluginDev/Assets/UnityVS/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll
+source/PluginDev/Assets/UnityVS/Editor/SyntaxTree.VisualStudio.Unity.Messaging.dll

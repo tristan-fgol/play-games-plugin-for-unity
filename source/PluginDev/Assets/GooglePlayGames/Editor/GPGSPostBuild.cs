@@ -30,7 +30,8 @@ namespace GooglePlayGames
         private const string UrlBundleName = "CFBundleURLName";
         private const string UrlScheme = "CFBundleURLSchemes";
 
-        [PostProcessBuild]
+        //FGOL Removed Automatic post process build so we can control it from our build process!
+        //[PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
 #if UNITY_4_6
@@ -47,7 +48,8 @@ namespace GooglePlayGames
             #if NO_GPGS
             Debug.Log("Removing AppController code since NO_GPGS is defined");
             // remove plugin code from generated project
-            string pluginDir = pathToBuiltProject + "/Libraries/Plugins/iOS";
+            //FGOL Modified as this is the correct path
+            string pluginDir = pathToBuiltProject + "/Libraries";
             if (System.IO.Directory.Exists(pluginDir))
             {
                 GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");

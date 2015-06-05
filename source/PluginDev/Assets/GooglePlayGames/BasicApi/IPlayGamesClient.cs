@@ -88,6 +88,12 @@ namespace GooglePlayGames.BasicApi
     /// in</returns>
     string GetUserImageUrl();
 
+    #region ADDED BY FGOL
+    string GetUserEmail();
+
+    string GetToken();
+    #endregion
+
     /// <summary>
     /// Returns the achievement corresponding to the passed achievement identifier.
     /// </summary>
